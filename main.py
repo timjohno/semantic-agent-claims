@@ -14,13 +14,17 @@ from typing import Annotated, Optional, TypedDict, List, Any, Dict
 from semantic_kernel import Kernel
 from semantic_kernel.agents import ChatCompletionAgent, ChatHistoryAgentThread
 from semantic_kernel.functions import KernelArguments, kernel_function
-from semantic_kernel.connectors.ai.open_ai import OpenAIChatCompletion
+from semantic_kernel.connectors.ai.open_ai import AzureChatCompletion
 from semantic_kernel.connectors.ai.function_choice_behavior import FunctionChoiceBehavior
 from semantic_kernel.connectors.ai.open_ai.prompt_execution_settings.open_ai_prompt_execution_settings import OpenAIChatPromptExecutionSettings
 from semantic_kernel.contents import ChatMessageContent, FunctionCallContent, FunctionResultContent, TextContent
 from sentence_transformers import SentenceTransformer
 
-api_key = st.secrets["api_keys"]["OPENAI_API_KEY"]
+
+openai_key = st.secrets["openai"]["AZURE_OPENAI_API_KEY"]
+openai_endpoint = st.secrets["openai"]["AZURE_OPENAI_ENDPOINT"]
+openai_version = st.secrets["openai"]["AZURE_OPENAI_API_VERSION"]
+openai_deployment_name = st.secrets["openai"]["AZURE_OPENAI_DEPLOYMENT_NAME"]
 
 # --- Instructions
 AGENT_INSTRUCTIONS = """You are an expert insurance claims consultant. Your name if asked is 'ICA'.  Your responsibilities include:
@@ -446,9 +450,10 @@ async def main(
     claim_text: Optional[str] = None
 ) -> AgentResponse:
     kernel = Kernel()
-    kernel.add_service(OpenAIChatCompletion(
-        ai_model_id="gpt-4.1-mini",
-        api_key=api_key,
+    kernel.add_service(AzureChatCompletion(
+        deployment_name="kainosgpt",
+        endpoint=openai_endpoint,
+        api_key=openai_key
     ))
 
     messages: List[AgentMessage] = []
